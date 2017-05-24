@@ -250,7 +250,7 @@ xiao_bugsjags <- function(data= WinBUGS.data,
   #jags_samples_summary <- summary(jags_samples)
   #jags_samples_summary$statistics
   
-  png("summary_plot.png",width=80,height=80,units="cm",res=600)
+  png("summary_plot.png",width=60,height=60,units="cm",res=600)
   par(mfrow=c(ncol(jags_samples[[1]])/3+1,6))
   plot(jags_samples,auto.layout=FALSE)
   dev.off()

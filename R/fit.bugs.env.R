@@ -648,6 +648,6 @@ results <- xiao_bugsjags( #R2jags_jags_revised
     results$x.nonclim <- x.nonclim
     results$x.factor <- x.factor
     results$which.beta <- which.beta
-
+    results$folder <- working.directory
     return(results)
 }
