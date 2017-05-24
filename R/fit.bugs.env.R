@@ -169,7 +169,8 @@ fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
     bugs.directory="C:/Program Files (x86)/WinBUGS14/",
     WinBUGS.debug=FALSE,WinBUGS.code=NULL,WinBUGS.code.location=NULL,
     no.starting.value=NULL,estimate.p=FALSE,estimate.u=FALSE,
-    u.clique.start,u.clique.end,adj.clique.start,adj.clique.end,clique,clique.i){
+    u.clique.start,u.clique.end,adj.clique.start,adj.clique.end,clique,clique.i,
+    whichbug="winbugs"){
 
     # Move to working directory or temporary directory when NULL
     inTempDir <- FALSE
@@ -552,10 +553,45 @@ fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
     if(!silent){
         cat("Starting WinBUGS run - opening WinBUGS now...\n")
     }
-    results <- bugs(WinBUGS.data,WinBUGS.inits,WinBUGS.monitor,WinBUGS.model,
-        chains,post.burnin+burnin,burnin,thin,
-        bugs.directory=bugs.directory,
-        working.directory=working.directory,codaPkg=FALSE,debug=WinBUGS.debug,DIC=FALSE)
+    
+    # old code
+    # results <- bugs(WinBUGS.data,WinBUGS.inits,WinBUGS.monitor,WinBUGS.model,
+    #     chains,post.burnin+burnin,burnin,thin,
+    #     bugs.directory=bugs.directory,
+    #     working.directory=working.directory,codaPkg=FALSE,debug=WinBUGS.debug,DIC=FALSE)
+    
+    if(whichbug=="winbugs"){
+      results <- bugs(WinBUGS.data,WinBUGS.inits,WinBUGS.monitor,WinBUGS.model,
+                      chains,post.burnin+burnin,burnin,thin,
+                      bugs.directory=bugs.directory,
+                      working.directory=working.directory,
+                      codaPkg=FALSE,
+                      debug=WinBUGS.debug,
+                      DIC=FALSE)
+    } else if(whichbug=="jags"){
+      #print(WinBUGS.monitor)
+      #jags automatically monitor deviance, so leave it out
+      WinBUGS.monitor <- WinBUGS.monitor[which(WinBUGS.monitor!="deviance")]
+      results <- R2jags::jags( #R2jags_jags_revised
+        data= WinBUGS.data,
+        inits=WinBUGS.inits,
+        parameters.to.save=WinBUGS.monitor,
+        model.file=WinBUGS.model,
+        n.chains=chains,
+        n.iter=post.burnin+burnin,
+        n.burnin=burnin,
+        n.thin=thin,
+        #jags.path=bugs.directory,
+        working.directory=working.directory,
+        #codaPkg=FALSE,
+        #debug=WinBUGS.debug,
+        DIC=TRUE)
+      # the data format from jags and winbugs are silightly different, so change..
+      results$means <- results$BUGSoutput$mean
+    }
+    
+    
+    
     if(!silent){
         cat("WinBUGS run completed.\n")
     }  
