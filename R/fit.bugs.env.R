@@ -588,6 +588,24 @@ fit.bugs.env <- function(data,y,x.clim,x.nonclim=NULL,x.factor=NULL,
         DIC=TRUE)
       # the data format from jags and winbugs are silightly different, so change..
       results$means <- results$BUGSoutput$mean
+    } else if(whichbug=="jags2"){
+      #print(WinBUGS.monitor)
+results <- xiao_bugsjags( #R2jags_jags_revised
+        data= WinBUGS.data,
+        inits=WinBUGS.inits,
+        parameters.to.save=WinBUGS.monitor,
+        model.file=WinBUGS.model,
+        n.chains=chains,
+        n.iter=post.burnin+burnin,
+        n.burnin=burnin,
+        n.thin=thin,
+        #jags.path=bugs.directory,
+        working.directory=working.directory,
+        #codaPkg=FALSE,
+        #debug=WinBUGS.debug,
+        DIC=TRUE)
+      # the data format from jags and winbugs are silightly different, so change..
+      results$means <- results$BUGSoutput$mean
     }
     
     
